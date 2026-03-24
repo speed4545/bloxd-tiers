@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Tiers Ranking</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+  background:#0b0f1a;
+  color:white;
+}
+
+header{
+  padding:20px;
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.controls{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+select,input{
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+  border:none;
+}
+
+table{
+  width:90%;
+  margin:auto;
+  border-collapse:collapse;
+  background:#111827;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+th,td{
+  padding:12px;
+  text-align:center;
+}
+
+th{
+  background:#1f2937;
+}
+
+tr:nth-child(even){
+  background:#0f172a;
+}
+
+/* tiers */
+.HT1{color:#ff0000;font-weight:bold;}
+.HT2{color:#ff4d4d;}
+.HT3{color:#ff8080;}
+.HT4{color:#ffb3b3;}
+.HT5{color:#ffd6d6;}
+
+.LT1{color:#00ff00;font-weight:bold;}
+.LT2{color:#33ff33;}
+.LT3{color:#66ff66;}
+.LT4{color:#99ff99;}
+.LT5{color:#ccffcc;}
+
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>🔥 MC TIERS RANKING 🔥</header>
+
+<div class="controls">
+  <select id="modeFilter" onchange="render()">
+    <option value="all">Todos</option>
+    <option value="pot">Pot PvP</option>
+    <option value="uhc">UHC</option>
+    <option value="hole">Hole PvP</option>
+  </select>
+
+  <input type="text" id="search" placeholder="Buscar jugador..." oninput="render()">
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Jugador</th>
+      <th>Modo</th>
+      <th>Tier</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+let players = [
+{ name:"9her", mode:"pot", tier:"HT2" },
+{ name:"Vornak", mode:"pot", tier:"LT1" },
+{ name:"BLOXD_REY", mode:"uhc", tier:"HT2" },
+{ name:"Kaliman", mode:"uhc", tier:"LT2" },
+{ name:"Salchi", mode:"hole", tier:"HT3" },
+{ name:"Wotuzion", mode:"pot", tier:"LT2" },
+{ name:"CRISVEL", mode:"pot", tier:"HT3" },
+{ name:"DARK_AW", mode:"uhc", tier:"HT3" },
+{ name:"Gamerbot", mode:"hole", tier:"HT4" },
+{ name:"Dylan", mode:"pot", tier:"HT4" }
+];
+
+function render(){
+  let mode = document.getElementById("modeFilter").value;
+  let search = document.getElementById("search").value.toLowerCase();
+  let tbody = document.getElementById("tbody");
+
+  tbody.innerHTML = "";
+
+  let filtered = players.filter(p =>
+    (mode === "all" || p.mode === mode) &&
+    p.name.toLowerCase().includes(search)
+  );
+
+  filtered.forEach((p, i) => {
+    let row = `
+    <tr>
+      <td>#${i+1}</td>
+      <td>${p.name}</td>
+      <td>${p.mode.toUpperCase()}</td>
+      <td class="${p.tier}">${p.tier}</td>
+    </tr>`;
+
+    tbody.innerHTML += row;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
