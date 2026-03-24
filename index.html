@@ -104,22 +104,29 @@
 
     <script>
         const database = {
-            overall: [
-                { n: "Marlowww", p: "450", r: "NA", s: "👤", t: [{i:"⚔️", l:"HT1"}, {i:"🧪", l:"HT1"}, {i:"🍎", l:"LT1"}] },
-                { n: "ItzRealMe", p: "330", r: "NA", s: "👤", t: [{i:"⚔️", l:"HT3"}, {i:"🕳️", l:"HT1"}] },
-                { n: "coldified", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1"}, {i:"⚔️", l:"HT2"}] }
-            ],
-            potpvp: [
-                { n: "Marlowww", p: "450", r: "NA", s: "👤", t: [{i:"🧪", l:"HT1"}] }
-            ],
-            holepvp: [
-                { n: "ItzRealMe", p: "330", r: "NA", s: "🐱", t: [{i:"🕳️", l:"HT1"}] }
-            ],
-            uhc: [
-                { n: "coldified", p: "296", r: "EU", s: "❄️", t: [{i:"🍎", l:"LT1"}] }
-            ]
-        };
-
+    overall: [
+        { n: "Bastka", p: "450", r: "NA", s: "👤", t: [{i:"🧪", l:"HT1 High"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "ITz_EL_REY_OSCURO_IT1", p: "330", r: "NA", s: "👤", t: [{i:"🧪", l:"HT1 Mid"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "Plasyer", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT1 Low"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "CR7SPANISH_TM_LT1", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 High"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "Vientoferoz", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 Mid"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "woze", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 Low"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "panchisss", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT2 High"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] },
+        { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT2 Mid"}, {i:"🕳️", l:"---"}, {i:"🍎", l:"---"}] }
+    ],
+    potpvp: [
+        { n: "Bastka", p: "450", r: "NA", s: "👤", t: [{i:"🧪", l:"HT1 High"}] },
+        { n: "ITz_EL_REY_OSCURO_IT1", p: "330", r: "NA", s: "👤", t: [{i:"🧪", l:"HT1 Mid"}] },
+        { n: "Plasyer", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT1 Low"}] },
+        { n: "CR7SPANISH_TM_LT1", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 High"}] },
+        { n: "Vientoferoz", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 Mid"}] },
+        { n: "woze", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"LT1 Low"}] },
+        { n: "panchisss", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT2 High"}] },
+        { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "EU", s: "👤", t: [{i:"🧪", l:"HT2 Mid"}] }
+    ],
+    holepvp: [], 
+    uhc: []
+};
         function cargar(modo, btn) {
             document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
             btn.classList.add('active');
