@@ -15,6 +15,8 @@
             --accent-orange: #f97316;
             --ht-color: #fbbf24; /* Color para HT */
             --lt-color: #94a3b8; /* Color para LT */
+            --danger: #ef4444;
+            --danger-bg: #2a1414;
         }
 
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
@@ -24,28 +26,29 @@
         .logo span { color: var(--accent-orange); }
 
         /* MODALIDADES */
-        .mode-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; padding: 10px; }
-        .mode-item { 
-            cursor: pointer; padding: 8px 16px; border-radius: 8px; 
-            background: #2d3748; color: var(--text-secondary); 
+        .mode-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; padding: 10px; flex-wrap: wrap; }
+        .mode-item {
+            cursor: pointer; padding: 8px 16px; border-radius: 8px;
+            background: #2d3748; color: var(--text-secondary);
             font-size: 13px; font-weight: bold; transition: 0.3s;
             display: flex; align-items: center; gap: 5px;
         }
         .mode-item.active { background: var(--accent-orange); color: white; border-bottom: 3px solid white; }
+        .mode-item.blacklist-tab.active { background: var(--danger); }
 
         /* TABLA PRINCIPAL */
         .ranking-container { max-width: 1100px; margin: 0 auto; background: var(--container-bg); border-radius: 12px; padding: 20px; }
 
-        /* ENCABEZADOS DE COLUMNA (Lo que pediste) */
+        /* ENCABEZADOS DE COLUMNA */
         .table-header {
             display: grid; grid-template-columns: 50px 70px 1fr 100px 300px;
             padding: 10px 20px; color: var(--text-secondary); font-size: 12px; font-weight: bold;
             letter-spacing: 1px;
         }
 
-        .ranking-row { 
-            display: grid; grid-template-columns: 50px 70px 1fr 100px 300px; 
-            align-items: center; background: var(--row-bg); padding: 15px 20px; 
+        .ranking-row {
+            display: grid; grid-template-columns: 50px 70px 1fr 100px 300px;
+            align-items: center; background: var(--row-bg); padding: 15px 20px;
             margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--row-border);
         }
 
@@ -61,15 +64,13 @@
 
         /* REGION */
         .region-tag { font-weight: bold; background: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 12px; width: fit-content; justify-self: center; }
-        .EU { background: #065f46; } /* Verde para EU */
+        .EU { background: #065f46; }
 
-        /* TIERS (Los dibujos y HT1) */
+        /* TIERS */
         .tiers-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-        .tier-pill {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-        }
-        .tier-icon { 
-            width: 24px; height: 24px; background: #374151; border-radius: 50%; 
+        .tier-pill { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .tier-icon {
+            width: 24px; height: 24px; background: #374151; border-radius: 50%;
             display: flex; justify-content: center; align-items: center; font-size: 12px;
             border: 1px solid var(--row-border);
         }
@@ -77,6 +78,62 @@
         .HT { background: var(--ht-color); color: #78350f; }
         .LT { background: var(--lt-color); color: #1e293b; }
 
+        /* ===== BLACK LIST ===== */
+        .bl-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .bl-title { font-size: 15px; font-weight: bold; color: var(--danger); display: flex; align-items: center; gap: 6px; }
+        .bl-admin-btn {
+            cursor: pointer; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--row-border);
+            background: #2d3748; color: var(--text-main); font-size: 12px; font-weight: bold;
+        }
+        .bl-admin-btn.on { background: var(--danger); border-color: var(--danger); }
+
+        .bl-card {
+            background: var(--row-bg); border: 1px solid var(--row-border); border-radius: 10px;
+            padding: 16px 18px; margin-bottom: 12px;
+        }
+        .bl-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .bl-name { font-size: 17px; font-weight: bold; color: var(--danger); }
+        .bl-date { font-size: 11px; color: var(--text-secondary); }
+        .bl-reason { font-size: 13px; color: var(--text-main); margin: 8px 0; white-space: pre-wrap; line-height: 1.4; }
+        .bl-reason.empty { color: var(--text-secondary); font-style: italic; }
+
+        .bl-evidence-imgs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .bl-evidence-imgs img {
+            width: 110px; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid var(--row-border);
+            cursor: pointer;
+        }
+        .bl-img-wrap { position: relative; }
+        .bl-img-remove {
+            position: absolute; top: -6px; right: -6px; background: var(--danger); color: white;
+            border-radius: 50%; width: 18px; height: 18px; font-size: 11px; line-height: 18px;
+            text-align: center; cursor: pointer; border: none;
+        }
+
+        .bl-video-links { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .bl-video-links a { color: #60a5fa; font-size: 12px; word-break: break-all; }
+        .bl-video-remove { background: none; border: none; color: var(--danger); font-size: 11px; cursor: pointer; margin-left: 6px; }
+
+        .bl-admin-controls { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--row-border); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .bl-admin-controls textarea, .bl-admin-controls input[type=text] {
+            background: #0b1220; border: 1px solid var(--row-border); color: var(--text-main);
+            border-radius: 6px; padding: 6px 8px; font-size: 12px; font-family: inherit;
+        }
+        .bl-admin-controls textarea { width: 100%; min-height: 50px; resize: vertical; }
+        .bl-small-btn {
+            cursor: pointer; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--row-border);
+            background: #2d3748; color: var(--text-main); font-size: 11px; font-weight: bold;
+        }
+        .bl-small-btn.danger { background: var(--danger-bg); border-color: var(--danger); color: #fca5a5; }
+        .bl-small-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+        .bl-add-card {
+            border: 1px dashed var(--accent-orange); border-radius: 10px; padding: 16px; margin-bottom: 16px;
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+        }
+        .bl-add-card input[type=text] { flex: 1; min-width: 160px; }
+
+        .bl-empty-note { color: var(--text-secondary); font-size: 12px; text-align: center; padding: 20px; }
+        .bl-note { font-size: 11px; color: var(--text-secondary); margin-top: 14px; text-align: center; }
     </style>
 </head>
 <body>
@@ -88,9 +145,10 @@
         <div class="mode-item" onclick="cargar('potpvp', this)">🧪 PotPvP</div>
         <div class="mode-item" onclick="cargar('holepvp', this)">🕳️ Hole PvP</div>
         <div class="mode-item" onclick="cargar('uhc', this)">🍎 UHC</div>
+        <div class="mode-item blacklist-tab" onclick="cargarBlacklist(this)">🚫 Black List</div>
     </div>
 
-    <div class="ranking-container">
+    <div class="ranking-container" id="ranking-view">
         <div class="table-header">
             <div>#</div>
             <div></div>
@@ -98,44 +156,56 @@
             <div style="text-align: center;">REGION</div>
             <div style="text-align: right;">TIERS</div>
         </div>
-
         <div id="lista"></div>
+    </div>
+
+    <div class="ranking-container" id="blacklist-view" style="display:none;">
+        <div class="bl-toolbar">
+            <div class="bl-title">🚫 BLACK LIST — Jugadores baneados / reportados</div>
+            <div id="bl-admin-btn-holder"></div>
+        </div>
+        <div id="bl-add-holder"></div>
+        <div id="bl-list"></div>
+        <div class="bl-note">Solo el administrador puede editar esta lista. Las evidencias (capturas y enlaces de video) quedan guardadas y son visibles para cualquiera que abra esta página.</div>
     </div>
 
     <script>
         const database = {
-    overall: [
-        { n: "woze", p: "450", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "siempremessi", p: "330", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Simple7973454", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Zz_P4RK_zZ", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Thua_retired", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "VientoFeroz", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Chelerin_bk", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Cakpaz_YT", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "_JUAN_BLACK_LT3", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "ITz_SUN_JIN_WOO_LT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "NOT_HERE_HT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "T_DyLAN_T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "zDAQUAVISz_L3GEND", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "T__Legendary__T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "gokublu_0FF", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "NOKOTAN_XD", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "M1M3__TX____", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Dagar_YT_Oficial", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "_D3STR0Y3R__", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "mexicoV1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "MONDOANTIGUO", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Itzmagmaboi_", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "REY_LAG", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "zThe_a17", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-    ],
-    potpvp: [],
-    holepvp: [], 
-    uhc: []
-};
+            overall: [
+                { n: "woze", p: "450", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "siempremessi", p: "330", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Simple7973454", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Zz_P4RK_zZ", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Thua_retired", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "VientoFeroz", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Chelerin_bk", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Cakpaz_YT", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "_JUAN_BLACK_LT3", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "ITz_SUN_JIN_WOO_LT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "NOT_HERE_HT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "T_DyLAN_T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "zDAQUAVISz_L3GEND", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "T__Legendary__T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "gokublu_0FF", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "NOKOTAN_XD", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "M1M3__TX____", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Dagar_YT_Oficial", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "_D3STR0Y3R__", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "mexicoV1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "MONDOANTIGUO", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "Itzmagmaboi_", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "REY_LAG", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+                { n: "zThe_a17", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            ],
+            potpvp: [],
+            holepvp: [],
+            uhc: []
+        };
+
         function cargar(modo, btn) {
+            document.getElementById('ranking-view').style.display = '';
+            document.getElementById('blacklist-view').style.display = 'none';
             document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
             btn.classList.add('active');
 
@@ -163,6 +233,226 @@
                     </div>
                 `;
             });
+        }
+
+        // ================= BLACK LIST =================
+
+        const ADMIN_PASSWORD = "T_T_Speed_T_T_"; // <-- cambia esto por tu propia contraseña antes de compartir el link
+        const BL_KEY = "blacklist:entries";
+        const SEED_NAMES = ["KALIMAN_TC", "S1CARIO", "DANIELITA_2222", "VORNAK", "LOBOSOLITARIOEXE", "NCP_PL4GL4_444", "XELWAR"];
+
+        let blEntries = null; // array of {name, reason, images:[dataURL], videos:[url], addedAt}
+        let isAdmin = false;
+
+        function fmtDate(ts) {
+            try { return new Date(ts).toLocaleDateString('es-ES', { year:'numeric', month:'short', day:'numeric' }); }
+            catch(e) { return ''; }
+        }
+
+        async function ensureBlLoaded() {
+            if (blEntries !== null) return;
+            try {
+                const res = await window.storage.get(BL_KEY, true);
+                blEntries = res && res.value ? JSON.parse(res.value) : null;
+            } catch (e) {
+                blEntries = null;
+            }
+            if (!blEntries) {
+                blEntries = SEED_NAMES.map(n => ({ name: n, reason: "", images: [], videos: [], addedAt: Date.now() }));
+                await saveBl();
+            }
+        }
+
+        async function saveBl() {
+            try {
+                await window.storage.set(BL_KEY, JSON.stringify(blEntries), true);
+            } catch (e) {
+                alert("No se pudo guardar (error de almacenamiento). Intenta de nuevo.");
+            }
+        }
+
+        function renderAdminBtn() {
+            document.getElementById('bl-admin-btn-holder').innerHTML = `
+                <div class="bl-admin-btn ${isAdmin ? 'on' : ''}" onclick="toggleAdmin()">
+                    ${isAdmin ? '🔓 Modo Admin (activo)' : '🔒 Entrar como Admin'}
+                </div>`;
+        }
+
+        function toggleAdmin() {
+            if (isAdmin) {
+                isAdmin = false;
+                renderAdminBtn();
+                renderBlacklist();
+                return;
+            }
+            const pass = prompt("Contraseña de administrador:");
+            if (pass === null) return;
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+            renderAdminBtn();
+            renderAddCard();
+            renderBlacklist();
+        }
+
+        function renderAddCard() {
+            const holder = document.getElementById('bl-add-holder');
+            if (!isAdmin) { holder.innerHTML = ""; return; }
+            holder.innerHTML = `
+                <div class="bl-add-card">
+                    <input type="text" id="bl-new-name" placeholder="Nombre exacto del jugador">
+                    <div class="bl-small-btn" onclick="addBlEntry()">+ Añadir a la Black List</div>
+                </div>`;
+        }
+
+        async function addBlEntry() {
+            const input = document.getElementById('bl-new-name');
+            const name = input.value.trim();
+            if (!name) return;
+            blEntries.unshift({ name, reason: "", images: [], videos: [], addedAt: Date.now() });
+            await saveBl();
+            renderBlacklist();
+        }
+
+        async function removeBlEntry(idx) {
+            if (!confirm(`¿Quitar a "${blEntries[idx].name}" de la Black List?`)) return;
+            blEntries.splice(idx, 1);
+            await saveBl();
+            renderBlacklist();
+        }
+
+        async function updateReason(idx, value) {
+            blEntries[idx].reason = value;
+            await saveBl();
+        }
+
+        // Compress + resize image client-side before storing (keeps entries small)
+        function fileToCompressedDataURL(file, maxDim = 900, quality = 0.72) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let { width, height } = img;
+                        if (width > height && width > maxDim) { height = height * (maxDim / width); width = maxDim; }
+                        else if (height > maxDim) { width = width * (maxDim / height); height = maxDim; }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = reader.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleImageUpload(idx, inputEl) {
+            const files = Array.from(inputEl.files || []);
+            if (!files.length) return;
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                try {
+                    const dataUrl = await fileToCompressedDataURL(file);
+                    // rough size guard so we don't blow past the per-key limit
+                    if (dataUrl.length > 1_500_000) {
+                        alert(`"${file.name}" es demasiado grande incluso comprimida. Prueba con otra captura.`);
+                        continue;
+                    }
+                    blEntries[idx].images.push(dataUrl);
+                } catch (e) {
+                    alert(`No se pudo procesar "${file.name}".`);
+                }
+            }
+            await saveBl();
+            renderBlacklist();
+        }
+
+        async function removeImage(idx, imgIdx) {
+            blEntries[idx].images.splice(imgIdx, 1);
+            await saveBl();
+            renderBlacklist();
+        }
+
+        async function addVideoLink(idx) {
+            const url = prompt("Pega el enlace del video (YouTube, Streamable, clip de Discord, etc.):");
+            if (!url) return;
+            try { new URL(url); } catch (e) { alert("Ese no parece un enlace válido."); return; }
+            blEntries[idx].videos.push(url);
+            await saveBl();
+            renderBlacklist();
+        }
+
+        async function removeVideoLink(idx, vIdx) {
+            blEntries[idx].videos.splice(vIdx, 1);
+            await saveBl();
+            renderBlacklist();
+        }
+
+        function renderBlacklist() {
+            const list = document.getElementById('bl-list');
+            if (!blEntries.length) {
+                list.innerHTML = `<div class="bl-empty-note">No hay jugadores en la Black List.</div>`;
+                return;
+            }
+            list.innerHTML = blEntries.map((e, idx) => {
+                const imagesHTML = e.images.map((src, i) => `
+                    <div class="bl-img-wrap">
+                        <img src="${src}" onclick="window.open('${src.replace(/'/g, "%27")}','_blank')">
+                        ${isAdmin ? `<button class="bl-img-remove" onclick="removeImage(${idx}, ${i})">×</button>` : ''}
+                    </div>
+                `).join('');
+
+                const videosHTML = e.videos.map((v, i) => `
+                    <div><a href="${v}" target="_blank" rel="noopener">🎬 ${v}</a>${isAdmin ? `<button class="bl-video-remove" onclick="removeVideoLink(${idx}, ${i})">quitar</button>` : ''}</div>
+                `).join('');
+
+                return `
+                <div class="bl-card">
+                    <div class="bl-card-head">
+                        <div>
+                            <div class="bl-name">⛔ ${e.name}</div>
+                            <div class="bl-date">Añadido: ${fmtDate(e.addedAt)}</div>
+                        </div>
+                        ${isAdmin ? `<div class="bl-small-btn danger" onclick="removeBlEntry(${idx})">Eliminar</div>` : ''}
+                    </div>
+
+                    ${isAdmin
+                        ? `<textarea placeholder="Motivo del ban / evidencia escrita..." onblur="updateReason(${idx}, this.value)">${e.reason}</textarea>`
+                        : `<div class="bl-reason ${e.reason ? '' : 'empty'}">${e.reason || 'Sin motivo publicado todavía.'}</div>`
+                    }
+
+                    <div class="bl-evidence-imgs">${imagesHTML}</div>
+                    <div class="bl-video-links">${videosHTML}</div>
+
+                    ${isAdmin ? `
+                        <div class="bl-admin-controls">
+                            <label class="bl-small-btn" style="cursor:pointer;">
+                                📷 Subir capturas
+                                <input type="file" accept="image/*" multiple style="display:none" onchange="handleImageUpload(${idx}, this)">
+                            </label>
+                            <div class="bl-small-btn" onclick="addVideoLink(${idx})">🎬 Añadir enlace de video</div>
+                        </div>
+                    ` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        async function cargarBlacklist(btn) {
+            document.getElementById('ranking-view').style.display = 'none';
+            document.getElementById('blacklist-view').style.display = '';
+            document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('bl-list').innerHTML = `<div class="bl-empty-note">Cargando...</div>`;
+            renderAdminBtn();
+            await ensureBlLoaded();
+            renderAddCard();
+            renderBlacklist();
         }
 
         window.onload = () => cargar('overall', document.querySelector('.mode-item'));
