@@ -1,149 +1,208 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloxd Tiers - Rankings</title>
-    <style>
-        :root {
-            --bg-color: #111827;
-            --container-bg: #1f2937;
-            --row-bg: #111827;
-            --row-border: #374151;
-            --text-main: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --accent-orange: #f97316;
-            --accent-red: #ef4444;
-            --ht-color: #fbbf24;
-            --lt-color: #94a3b8;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloxd Tier List — Rankings oficiales de Bloxd.io</title>
+<meta name="description" content="Bloxd Tier List: rankings de PotPvP, Hole PvP y UHC de Bloxd.io, con lista negra de jugadores tramposos y pruebas.">
+<meta property="og:title" content="Bloxd Tier List">
+<meta property="og:description" content="Rankings oficiales de Bloxd.io: PotPvP, Hole PvP, UHC y Black List.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+    :root {
+        --bg: #0b0d12;
+        --bg-raised: #12151d;
+        --panel: #171b25;
+        --line: #262b38;
+        --text: #eef0f5;
+        --text-dim: #8890a3;
+        --molten: #ff6a2b;
+        --molten-dim: #c2461a;
+        --gold: #ffb020;
+        --steel: #7c8598;
+        --danger: #ff3b5c;
+        --ok: #35d67c;
+        --clip: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: 'Inter', sans-serif;
+        background-image:
+            radial-gradient(circle at 15% 0%, rgba(255,106,43,0.10), transparent 40%),
+            radial-gradient(circle at 85% 20%, rgba(255,59,92,0.08), transparent 40%);
+    }
+    h1, h2, .display { font-family: 'Chakra Petch', sans-serif; }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+    /* ===== HERO ===== */
+    .hero {
+        padding: 56px 24px 40px; text-align: center; position: relative; overflow: hidden;
+        border-bottom: 1px solid var(--line);
+    }
+    .hero::before {
+        content: ""; position: absolute; inset: 0; z-index: 0;
+        background: repeating-linear-gradient(115deg, transparent 0 38px, rgba(255,255,255,0.02) 38px 39px);
+        pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .eyebrow {
+        display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
+        letter-spacing: 2px; color: var(--molten); text-transform: uppercase; margin-bottom: 14px;
+    }
+    .eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 2px; background: var(--molten); }
+    .hero h1 {
+        font-size: clamp(34px, 7vw, 64px); font-weight: 700; margin: 0; line-height: 1;
+        letter-spacing: 1px;
+    }
+    .hero h1 span { color: var(--molten); }
+    .hero p { color: var(--text-dim); max-width: 520px; margin: 16px auto 0; font-size: 15px; line-height: 1.6; }
 
-        .logo { font-size: 24px; font-weight: bold; padding: 10px 40px; }
-        .logo span { color: var(--accent-orange); }
+    /* ===== TABS ===== */
+    .mode-bar { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 28px auto 24px; padding: 0 16px; }
+    .mode-item {
+        cursor: pointer; padding: 10px 18px; clip-path: var(--clip);
+        background: var(--panel); color: var(--text-dim); border: 1px solid var(--line);
+        font-family: 'Chakra Petch', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;
+        display: flex; align-items: center; gap: 6px; transition: 0.15s;
+    }
+    .mode-item:hover { color: var(--text); border-color: var(--molten-dim); }
+    .mode-item.active { background: var(--molten); color: #1a0a02; border-color: var(--molten); }
+    .mode-item.blacklist-tab.active { background: var(--danger); color: #2a0008; border-color: var(--danger); }
 
-        .mode-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; padding: 10px; flex-wrap: wrap; }
-        .mode-item {
-            cursor: pointer; padding: 8px 16px; border-radius: 8px;
-            background: #2d3748; color: var(--text-secondary);
-            font-size: 13px; font-weight: bold; transition: 0.3s;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .mode-item.active { background: var(--accent-orange); color: white; border-bottom: 3px solid white; }
-        .mode-item.blacklist-tab.active { background: var(--accent-red); }
+    /* ===== RANKING ===== */
+    .container { max-width: 1000px; margin: 0 auto 40px; padding: 0 16px; }
+    .panel { background: var(--panel); border: 1px solid var(--line); clip-path: var(--clip); padding: 20px; }
+    .table-header {
+        display: grid; grid-template-columns: 44px 60px 1fr 90px 280px;
+        padding: 6px 14px 14px; color: var(--text-dim); font-size: 11px; font-weight: 700;
+        letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid var(--line); margin-bottom: 10px;
+    }
+    .ranking-row {
+        display: grid; grid-template-columns: 44px 60px 1fr 90px 280px; align-items: center;
+        background: var(--bg-raised); padding: 12px 14px; margin-bottom: 6px; border-radius: 6px;
+        border: 1px solid transparent; transition: 0.15s;
+    }
+    .ranking-row:hover { border-color: var(--molten-dim); }
+    .rank-number { font-family: 'Chakra Petch', sans-serif; font-size: 20px; font-weight: 700; color: var(--steel); font-style: italic; }
+    .ranking-row:nth-child(1) .rank-number { color: var(--gold); }
+    .ranking-row:nth-child(2) .rank-number { color: #d8dbe3; }
+    .ranking-row:nth-child(3) .rank-number { color: #c9812f; }
+    .skin-box {
+        width: 46px; height: 46px; background: linear-gradient(145deg, #2a3040, #12151d);
+        border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 20px;
+        border: 1px solid var(--line);
+    }
+    .player-info { padding-left: 12px; overflow: hidden; }
+    .player-name { font-size: 16px; font-weight: 600; margin: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .player-title { font-size: 11px; color: var(--text-dim); margin: 2px 0 0; }
+    .player-title span { color: var(--gold); font-weight: 600; }
+    .region-tag {
+        font-weight: 700; font-size: 11px; background: #2a1620; color: #ff8fa8;
+        padding: 3px 9px; border-radius: 4px; width: fit-content; justify-self: center;
+    }
+    .tiers-grid { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .tier-pill { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .tier-icon {
+        width: 22px; height: 22px; background: #1c202b; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; font-size: 11px; border: 1px solid var(--line);
+    }
+    .tier-label { font-size: 8px; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
+    .HT { background: var(--gold); color: #3a2500; }
+    .LT { background: var(--steel); color: #10131a; }
 
-        .ranking-container { max-width: 1100px; margin: 0 auto; background: var(--container-bg); border-radius: 12px; padding: 20px; }
+    /* ===== BLACK LIST ===== */
+    .bl-card {
+        background: var(--bg-raised); border: 1px solid rgba(255,59,92,0.35); border-radius: 8px;
+        padding: 14px 18px; margin-bottom: 10px;
+    }
+    .bl-card-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 10px; }
+    .bl-name { font-family: 'Chakra Petch', sans-serif; font-size: 16px; font-weight: 700; color: var(--danger); }
+    .bl-count { font-size: 11px; color: var(--text-dim); margin-left: 6px; }
+    .bl-evidence { display: none; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+    .bl-evidence.open { display: flex; }
+    .bl-evidence-item { width: 200px; }
+    .bl-evidence-item img, .bl-evidence-item iframe, .bl-evidence-item video {
+        width: 200px; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: #000;
+    }
+    .bl-evidence-caption { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+    .bl-evidence-empty { font-size: 12px; color: var(--text-dim); font-style: italic; }
+    .bl-remove-btn {
+        background: none; border: 1px solid var(--danger); color: var(--danger);
+        border-radius: 4px; font-size: 10px; padding: 2px 6px; cursor: pointer; margin-left: 6px;
+    }
+    .bl-empty-state { text-align: center; color: var(--text-dim); font-size: 13px; padding: 30px 0; }
 
-        .table-header {
-            display: grid; grid-template-columns: 50px 70px 1fr 100px 300px;
-            padding: 10px 20px; color: var(--text-secondary); font-size: 12px; font-weight: bold;
-            letter-spacing: 1px;
-        }
+    /* ===== ADMIN ===== */
+    .admin-box { max-width: 1000px; margin: 20px auto 60px; padding: 0 16px; }
+    .admin-panel { background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; padding: 18px 20px; }
+    .admin-panel h3 { margin: 0 0 12px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Chakra Petch', sans-serif; }
+    .admin-locked { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .admin-unlocked { display: none; flex-direction: column; gap: 10px; }
+    .admin-unlocked.open { display: flex; }
+    .admin-panel input, .admin-panel select {
+        background: var(--bg-raised); border: 1px solid var(--line); color: var(--text);
+        padding: 8px 10px; border-radius: 6px; font-size: 13px; font-family: inherit;
+    }
+    .admin-panel button {
+        background: var(--molten); color: #1a0a02; border: none; border-radius: 6px;
+        padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Chakra Petch', sans-serif;
+    }
+    .admin-msg { font-size: 12px; margin-top: 4px; }
+    .admin-msg.err { color: var(--danger); }
+    .admin-msg.ok { color: var(--ok); }
+    .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .admin-note { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+    .logout-btn { background: transparent !important; border: 1px solid var(--text-dim) !important; color: var(--text-dim) !important; }
+    #bl-file-preview { display: none; align-items: center; gap: 10px; font-size: 12px; color: var(--text-dim); }
+    #bl-file-preview.show { display: flex; }
+    #bl-file-preview img, #bl-file-preview video { max-width: 140px; max-height: 90px; border-radius: 6px; border: 1px solid var(--line); }
+    .sync-badge { font-size: 11px; color: var(--ok); display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+    .sync-dot.off { background: var(--steel); box-shadow: none; }
 
-        .ranking-row {
-            display: grid; grid-template-columns: 50px 70px 1fr 100px 300px;
-            align-items: center; background: var(--row-bg); padding: 15px 20px;
-            margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--row-border);
-        }
-
-        .rank-number { font-size: 22px; font-weight: bold; font-style: italic; color: white; }
-        .skin-box { width: 55px; height: 55px; background: linear-gradient(45deg, #374151, #111827); border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
-
-        .player-info { padding-left: 15px; }
-        .player-name { font-size: 18px; font-weight: bold; margin: 0; }
-        .player-title { font-size: 12px; color: var(--text-secondary); margin: 0; }
-        .player-title span { color: #60a5fa; }
-
-        .region-tag { font-weight: bold; background: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 12px; width: fit-content; justify-self: center; }
-        .EU { background: #065f46; }
-
-        .tiers-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-        .tier-pill { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .tier-icon {
-            width: 24px; height: 24px; background: #374151; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 12px;
-            border: 1px solid var(--row-border);
-        }
-        .tier-label { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; }
-        .HT { background: var(--ht-color); color: #78350f; }
-        .LT { background: var(--lt-color); color: #1e293b; }
-
-        /* ===== BLACK LIST ===== */
-        .bl-card {
-            background: var(--row-bg); border: 1px solid var(--accent-red);
-            border-radius: 10px; padding: 16px 20px; margin-bottom: 12px;
-        }
-        .bl-card-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-        .bl-name { font-size: 18px; font-weight: bold; color: var(--accent-red); }
-        .bl-count { font-size: 12px; color: var(--text-secondary); margin-left: 6px; }
-        .bl-evidence { display: none; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
-        .bl-evidence.open { display: flex; }
-        .bl-evidence-item { width: 220px; }
-        .bl-evidence-item img, .bl-evidence-item iframe, .bl-evidence-item video {
-            width: 220px; height: 130px; object-fit: cover; border-radius: 6px; border: 1px solid var(--row-border);
-        }
-        #bl-file-preview.show { display: flex !important; }
-        #bl-file-preview img, #bl-file-preview video { max-width: 160px; max-height: 100px; border-radius: 6px; border: 1px solid var(--row-border); }
-        #bl-file-preview { align-items: center; gap: 10px; font-size: 12px; color: var(--text-secondary); }
-        .bl-evidence-caption { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
-        .bl-evidence-empty { font-size: 13px; color: var(--text-secondary); font-style: italic; }
-        .bl-remove-btn {
-            background: none; border: 1px solid var(--accent-red); color: var(--accent-red);
-            border-radius: 4px; font-size: 11px; padding: 2px 6px; cursor: pointer; margin-left: 8px;
-        }
-
-        /* ADMIN PANEL */
-        .admin-box { max-width: 1100px; margin: 24px auto 0; background: var(--container-bg); border-radius: 12px; padding: 20px; border: 1px dashed var(--row-border); }
-        .admin-box h3 { margin-top: 0; font-size: 14px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
-        .admin-locked { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .admin-unlocked { display: none; flex-direction: column; gap: 10px; }
-        .admin-unlocked.open { display: flex; }
-        .admin-box input, .admin-box select {
-            background: #111827; border: 1px solid var(--row-border); color: var(--text-main);
-            padding: 8px 10px; border-radius: 6px; font-size: 13px;
-        }
-        .admin-box button {
-            background: var(--accent-orange); color: white; border: none; border-radius: 6px;
-            padding: 8px 14px; font-size: 13px; font-weight: bold; cursor: pointer;
-        }
-        .admin-msg { font-size: 12px; margin-top: 4px; }
-        .admin-msg.err { color: var(--accent-red); }
-        .admin-msg.ok { color: #10b981; }
-        .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .admin-note { font-size: 11px; color: var(--text-secondary); margin-top: 10px; line-height: 1.5; }
-        .logout-btn { background: transparent !important; border: 1px solid var(--text-secondary) !important; color: var(--text-secondary) !important; }
-    </style>
+    footer { text-align: center; padding: 24px; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--line); }
+    footer span { color: var(--molten); }
+</style>
 </head>
 <body>
 
-    <div class="logo">BLOXD<span>TIERS</span></div>
-
-    <div class="mode-bar">
-        <div class="mode-item active" onclick="cargar('overall', this)">🏆 Overall</div>
-        <div class="mode-item" onclick="cargar('potpvp', this)">🧪 PotPvP</div>
-        <div class="mode-item" onclick="cargar('holepvp', this)">🕳️ Hole PvP</div>
-        <div class="mode-item" onclick="cargar('uhc', this)">🍎 UHC</div>
-        <div class="mode-item blacklist-tab" onclick="mostrarBlacklist(this)">🚫 Black List</div>
+<div class="hero">
+    <div class="hero-inner">
+        <div class="eyebrow">Rankings comunitarios</div>
+        <h1>BLOXD<span>TIERS</span></h1>
+        <p>El tier list oficial de la comunidad para Bloxd.io — PotPvP, Hole PvP, UHC, y la lista negra de jugadores baneados por hacks o trampas comprobadas.</p>
     </div>
+</div>
 
-    <div class="ranking-container" id="ranking-view">
+<div class="mode-bar">
+    <div class="mode-item active" onclick="cargar('overall', this)">🏆 Overall</div>
+    <div class="mode-item" onclick="cargar('potpvp', this)">🧪 PotPvP</div>
+    <div class="mode-item" onclick="cargar('holepvp', this)">🕳️ Hole PvP</div>
+    <div class="mode-item" onclick="cargar('uhc', this)">🍎 UHC</div>
+    <div class="mode-item blacklist-tab" onclick="mostrarBlacklist(this)">🚫 Black List</div>
+</div>
+
+<div class="container">
+    <div class="panel" id="ranking-view">
         <div class="table-header">
-            <div>#</div>
-            <div></div>
-            <div>PLAYER</div>
-            <div style="text-align: center;">REGION</div>
-            <div style="text-align: right;">TIERS</div>
+            <div>#</div><div></div><div>Player</div>
+            <div style="text-align:center;">Region</div>
+            <div style="text-align:right;">Tiers</div>
         </div>
-
         <div id="lista"></div>
     </div>
 
-    <div class="ranking-container" id="blacklist-view" style="display:none;">
+    <div class="panel" id="blacklist-view" style="display:none;">
+        <div class="sync-badge"><span class="sync-dot" id="sync-dot"></span><span id="sync-text">Conectando...</span></div>
         <div id="bl-lista"></div>
     </div>
+</div>
 
-    <div class="admin-box" id="admin-box" style="display:none;">
+<div class="admin-box" id="admin-box" style="display:none;">
+    <div class="admin-panel">
         <h3>Panel de administrador — Black List</h3>
 
         <div class="admin-locked" id="admin-locked">
@@ -159,13 +218,11 @@
                 <button onclick="logout()" class="logout-btn">Cerrar sesión</button>
             </div>
             <div class="admin-row">
-                <label style="font-size:12px; color:var(--text-secondary);">📁 Subir desde tu dispositivo:</label>
+                <label style="font-size:12px; color:var(--text-dim);">📁 Subir desde tu dispositivo:</label>
                 <input type="file" id="bl-media-file" accept="image/*,video/*" onchange="previewArchivo()">
             </div>
-            <div id="bl-file-preview" style="display:none;"></div>
-            <div class="admin-row">
-                <span style="font-size:11px; color:var(--text-secondary);">— o pegá un link en vez de subir —</span>
-            </div>
+            <div id="bl-file-preview"></div>
+            <div class="admin-row"><span style="font-size:11px; color:var(--text-dim);">— o pegá un link en vez de subir —</span></div>
             <div class="admin-row">
                 <select id="bl-media-type">
                     <option value="image">Captura de pantalla (URL de imagen)</option>
@@ -179,295 +236,347 @@
             </div>
             <span id="admin-msg" class="admin-msg"></span>
             <p class="admin-note">
-                ⚠️ Este panel es solo una traba del lado del cliente: evita que otros jugadores editen la lista por accidente, pero no es seguridad real (cualquiera con conocimientos técnicos podría ver el código fuente). No lo uses para algo que necesite estar realmente protegido.
-                <br>⚠️ Lo que agregues acá se guarda mientras la página siga abierta en tu navegador. Para que quede permanente en el sitio publicado hay que pasarlo al código (como los jugadores del ranking, que ya están escritos directo en el JS) o conectar un almacenamiento real — decime si querés que te ayude a armar eso.
-                <br>⚠️ Los archivos subidos se incrustan directo en la página (sin subirlos a ningún servidor externo), así que funcionan mejor con imágenes o videos cortos y livianos; archivos muy pesados pueden hacer que la página cargue lento.
+                ⚠️ La contraseña es solo una traba del lado del cliente: evita que cualquiera edite la lista desde la página, pero no es seguridad de nivel profesional (alguien con conocimientos técnicos podría escribir directo a la base de datos). Para bloquear eso del todo hay que activar reglas de seguridad de Firebase con autenticación — decime si querés que te ayude a subir ese nivel más adelante.
+                <br>⚠️ Los archivos subidos se guardan incrustados en la base de datos como están, sin pasar por un servidor de imágenes aparte — funciona mejor con imágenes o clips cortos y livianos.
             </p>
         </div>
     </div>
+</div>
 
-    <script>
-        const database = {
-    overall: [
-        { n: "woze", p: "450", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "siempremessi", p: "330", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Simple7973454", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Zz_P4RK_zZ", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Thua_retired", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "VientoFeroz", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Chelerin_bk", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Cakpaz_YT", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "_JUAN_BLACK_LT3", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "ITz_SUN_JIN_WOO_LT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "NOT_HERE_HT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "T_DyLAN_T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "zDAQUAVISz_L3GEND", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "T__Legendary__T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "gokublu_0FF", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "NOKOTAN_XD", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "M1M3__TX____", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Dagar_YT_Oficial", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "_D3STR0Y3R__", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "mexicoV1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "MONDOANTIGUO", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "Itzmagmaboi_", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "REY_LAG", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-        { n: "zThe_a17", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
-    ],
-    potpvp: [],
-    holepvp: [],
-    uhc: []
-};
+<footer>bloxdtiers — hecho por la comunidad · <span>#bloxdtierlist</span></footer>
 
-        // ===== BLACK LIST DATA =====
-        // Cada jugador tiene un array "evidence" con { type: "image"|"video", url, caption }
-        let blacklist = [
-            { n: "S1CARIO", evidence: [] },
-            { n: "FTX_ALEJANDRO_FTX", evidence: [] },
-            { n: "SANTI_YT", evidence: [] },
-            { n: "DOMINADOR_SID", evidence: [] },
-            { n: "IAM_WOLF_JUAN_CLIENT", evidence: [] },
-            { n: "Jz_retiredxz", evidence: [] },
-            { n: "Xelwar", evidence: [] },
-            { n: "THR_S4_2242132_S4_W7F", evidence: [] },
-            { n: "Thua_Is_Back", evidence: [] },
-            { n: "Maffer", evidence: [] },
-            { n: "TX_Rev", evidence: [] },
-            { n: "PANCITO_AUTO", evidence: [] },
-            { n: "CR7SPANISH_TM_LT1", evidence: [] },
-            { n: "tanj1ro_prime", evidence: [] },
-            { n: "Plasyer", evidence: [] },
-            { n: "VORNAK", evidence: [] },
-            { n: "NCP_PL4GL4_444", evidence: [] },
-        ];
+<script>
+    const database = {
+        overall: [
+            { n: "woze", p: "450", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "siempremessi", p: "330", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Simple7973454", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Zz_P4RK_zZ", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Thua_retired", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "VientoFeroz", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Low"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Chelerin_bk", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"High"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Cakpaz_YT", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "_JUAN_BLACK_LT3", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "ITz_SUN_JIN_WOO_LT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "NOT_HERE_HT1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "T_DyLAN_T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "zDAQUAVISz_L3GEND", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "T__Legendary__T", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "gokublu_0FF", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "NOKOTAN_XD", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "M1M3__TX____", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Dagar_YT_Oficial", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "_D3STR0Y3R__", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "mexicoV1", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "MONDOANTIGUO", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "BD_zK4N_KevW1u_XvX", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "Itzmagmaboi_", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "REY_LAG", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+            { n: "zThe_a17", p: "296", r: "__", s: "👤", t: [{i:"🧪", l:"Mid"}, {i:"🕳️", l:"__"}, {i:"🍎", l:"__"}] },
+        ],
+        potpvp: [], holepvp: [], uhc: []
+    };
 
-        // Hash SHA-256 de la contraseña de admin (no se guarda en texto plano en el código)
-        const ADMIN_HASH = "aec6aae909029827b51424627a80a0ea2e07866c52a739ed5cc59e477448072d";
-        let isAdmin = false;
+    // ============ FIREBASE ============
+    // 1) Reemplazá esto con la config real de TU proyecto de Firebase (ver instrucciones).
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROYECTO.firebaseapp.com",
+        projectId: "TU_PROYECTO",
+        storageBucket: "TU_PROYECTO.appspot.com",
+        messagingSenderId: "TU_SENDER_ID",
+        appId: "TU_APP_ID"
+    };
 
-        async function sha256(msg) {
-            const data = new TextEncoder().encode(msg);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    let db = null;
+    let firebaseListo = false;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseListo = true;
+    } catch (e) {
+        console.warn("Firebase no está configurado todavía:", e);
+    }
+
+    const DEFAULT_BLACKLIST = ["KALIMAN_TC","S1CARIO","DANIELITA_2222","VORNAK","LOBOSOLITARIOEXE","NCP_PL4GL4_444","XELWAR"];
+    let blacklist = DEFAULT_BLACKLIST.map(n => ({ n, evidence: [] }));
+
+    const ADMIN_HASH = "aec6aae909029827b51424627a80a0ea2e07866c52a739ed5cc59e477448072d";
+    let isAdmin = false;
+
+    function slug(name) { return name.toLowerCase().replace(/[^a-z0-9_]/g, "_"); }
+
+    async function sha256(msg) {
+        const data = new TextEncoder().encode(msg);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Escucha en vivo la colección "blacklist" en Firestore, así todos los que
+    // visiten la página ven la lista actualizada sin recargar.
+    function iniciarSyncBlacklist() {
+        const dot = document.getElementById('sync-dot');
+        const text = document.getElementById('sync-text');
+        if (!firebaseListo) {
+            dot.classList.add('off');
+            text.textContent = "Sin conectar a la base de datos — configurá Firebase para que se guarde de verdad";
+            return;
         }
-
-        function cargar(modo, btn) {
-            document.getElementById('ranking-view').style.display = 'block';
-            document.getElementById('blacklist-view').style.display = 'none';
-            document.getElementById('admin-box').style.display = 'none';
-            document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
-            btn.classList.add('active');
-
-            const contenedor = document.getElementById('lista');
-            contenedor.innerHTML = "";
-
-            database[modo].forEach((j, i) => {
-                let tiersHTML = j.t.map(tier => `
-                    <div class="tier-pill">
-                        <div class="tier-icon">${tier.i}</div>
-                        <span class="tier-label ${tier.l.includes('HT') ? 'HT' : 'LT'}">${tier.l}</span>
-                    </div>
-                `).join('');
-
-                contenedor.innerHTML += `
-                    <div class="ranking-row">
-                        <div class="rank-number">${i+1}.</div>
-                        <div class="skin-box">${j.s}</div>
-                        <div class="player-info">
-                            <p class="player-name">${j.n}</p>
-                            <p class="player-title">Combat Master (<span>${j.p} points</span>)</p>
-                        </div>
-                        <div class="region-tag ${j.r}">${j.r}</div>
-                        <div class="tiers-grid">${tiersHTML}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function mostrarBlacklist(btn) {
-            document.getElementById('ranking-view').style.display = 'none';
-            document.getElementById('blacklist-view').style.display = 'block';
-            document.getElementById('admin-box').style.display = 'block';
-            document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
-            btn.classList.add('active');
+        db.collection('blacklist').onSnapshot(async (snap) => {
+            dot.classList.remove('off');
+            text.textContent = "Conectado — los cambios se guardan y se ven en vivo";
+            if (snap.empty) {
+                const batch = db.batch();
+                DEFAULT_BLACKLIST.forEach(n => {
+                    batch.set(db.collection('blacklist').doc(slug(n)), { n, evidence: [] });
+                });
+                await batch.commit();
+                return;
+            }
+            blacklist = snap.docs.map(d => d.data());
             renderBlacklist();
             renderPlayerSelect();
-        }
+        }, (err) => {
+            dot.classList.add('off');
+            text.textContent = "Error de conexión con la base de datos";
+            console.error(err);
+        });
+    }
 
-        function renderBlacklist() {
-            const cont = document.getElementById('bl-lista');
-            cont.innerHTML = "";
-            blacklist.forEach((j, idx) => {
-                let evHTML = "";
-                if (j.evidence.length === 0) {
-                    evHTML = `<div class="bl-evidence-empty">Sin pruebas cargadas todavía.</div>`;
-                } else {
-                    evHTML = j.evidence.map((e, eIdx) => {
-                        let media;
-                        if (e.type === 'image') {
-                            media = `<img src="${e.url}" alt="prueba">`;
-                        } else if (e.type === 'video-file') {
-                            media = `<video src="${e.url}" controls></video>`;
-                        } else {
-                            media = `<iframe src="${toEmbed(e.url)}" frameborder="0" allowfullscreen></iframe>`;
-                        }
-                        const removeBtn = isAdmin ? `<button class="bl-remove-btn" onclick="quitarEvidencia(${idx}, ${eIdx})">quitar</button>` : "";
-                        return `<div class="bl-evidence-item">${media}<div class="bl-evidence-caption">${e.caption || ""} ${removeBtn}</div></div>`;
-                    }).join('');
-                }
-                const removePlayerBtn = isAdmin ? `<button class="bl-remove-btn" onclick="quitarJugador(${idx})">quitar jugador</button>` : "";
-                cont.innerHTML += `
-                    <div class="bl-card">
-                        <div class="bl-card-header" onclick="toggleEvidence(${idx})">
-                            <div>
-                                <span class="bl-name">🚫 ${j.n}</span>
-                                <span class="bl-count">(${j.evidence.length} prueba${j.evidence.length === 1 ? '' : 's'})</span>
-                            </div>
-                            <div>${removePlayerBtn}</div>
-                        </div>
-                        <div class="bl-evidence" id="bl-ev-${idx}">${evHTML}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function toEmbed(url) {
-            const match = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
-            if (match) return `https://www.youtube.com/embed/${match[1]}`;
-            return url;
-        }
-
-        function toggleEvidence(idx) {
-            document.getElementById(`bl-ev-${idx}`).classList.toggle('open');
-        }
-
-        function renderPlayerSelect() {
-            const sel = document.getElementById('bl-player-select');
-            sel.innerHTML = `<option value="">— elegir jugador existente —</option>` +
-                blacklist.map((j, idx) => `<option value="${idx}">${j.n}</option>`).join('');
-        }
-
-        async function intentarLogin() {
-            const pass = document.getElementById('admin-pass').value;
-            const hash = await sha256(pass);
-            const msg = document.getElementById('login-msg');
-            if (hash === ADMIN_HASH) {
-                isAdmin = true;
-                document.getElementById('admin-locked').style.display = 'none';
-                document.getElementById('admin-unlocked').classList.add('open');
-                msg.textContent = "";
-                renderBlacklist();
-            } else {
-                msg.textContent = "Contraseña incorrecta";
-                msg.className = "admin-msg err";
-            }
-        }
-
-        function logout() {
-            isAdmin = false;
-            document.getElementById('admin-locked').style.display = 'flex';
-            document.getElementById('admin-unlocked').classList.remove('open');
-            document.getElementById('admin-pass').value = '';
+    async function guardarJugador(idx) {
+        const j = blacklist[idx];
+        if (firebaseListo) {
+            await db.collection('blacklist').doc(slug(j.n)).set({ n: j.n, evidence: j.evidence });
+        } else {
             renderBlacklist();
         }
+    }
 
-        // Datos del archivo subido desde el dispositivo (si hay uno)
-        let archivoSubido = null; // { type: 'image'|'video-file', url: dataURL }
-
-        function previewArchivo() {
-            const input = document.getElementById('bl-media-file');
-            const preview = document.getElementById('bl-file-preview');
-            const file = input.files[0];
-            archivoSubido = null;
-            preview.classList.remove('show');
-            preview.innerHTML = "";
-
-            if (!file) return;
-
-            const esImagen = file.type.startsWith('image/');
-            const esVideo = file.type.startsWith('video/');
-            if (!esImagen && !esVideo) {
-                document.getElementById('admin-msg').textContent = "Ese tipo de archivo no está soportado, subí una imagen o un video.";
-                document.getElementById('admin-msg').className = "admin-msg err";
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                archivoSubido = { type: esImagen ? 'image' : 'video-file', url: e.target.result };
-                preview.classList.add('show');
-                if (esImagen) {
-                    preview.innerHTML = `<img src="${archivoSubido.url}"><span>${file.name}</span>`;
-                } else {
-                    preview.innerHTML = `<video src="${archivoSubido.url}" controls></video><span>${file.name}</span>`;
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function agregarEvidencia() {
-            if (!isAdmin) return;
-            const selectVal = document.getElementById('bl-player-select').value;
-            const newName = document.getElementById('bl-new-name').value.trim();
-            const type = document.getElementById('bl-media-type').value;
-            const url = document.getElementById('bl-media-url').value.trim();
-            const caption = document.getElementById('bl-caption').value.trim();
-            const msg = document.getElementById('admin-msg');
-
-            // El archivo subido desde el dispositivo tiene prioridad sobre la URL pegada
-            let entry;
-            if (archivoSubido) {
-                entry = { type: archivoSubido.type, url: archivoSubido.url, caption };
-            } else if (url) {
-                entry = { type, url, caption };
-            } else {
-                msg.textContent = "Subí un archivo desde tu dispositivo o pegá una URL.";
-                msg.className = "admin-msg err";
-                return;
-            }
-
-            let idx;
-            if (newName) {
-                blacklist.push({ n: newName, evidence: [] });
-                idx = blacklist.length - 1;
-            } else if (selectVal !== "") {
-                idx = parseInt(selectVal);
-            } else {
-                msg.textContent = "Elegí un jugador existente o escribí uno nuevo.";
-                msg.className = "admin-msg err";
-                return;
-            }
-
-            blacklist[idx].evidence.push(entry);
-            document.getElementById('bl-new-name').value = '';
-            document.getElementById('bl-media-url').value = '';
-            document.getElementById('bl-caption').value = '';
-            document.getElementById('bl-media-file').value = '';
-            document.getElementById('bl-file-preview').classList.remove('show');
-            document.getElementById('bl-file-preview').innerHTML = '';
-            archivoSubido = null;
-            msg.textContent = "Prueba agregada.";
-            msg.className = "admin-msg ok";
-            renderPlayerSelect();
-            renderBlacklist();
-        }
-
-        function quitarEvidencia(idx, eIdx) {
-            if (!isAdmin) return;
-            blacklist[idx].evidence.splice(eIdx, 1);
-            renderBlacklist();
-        }
-
-        function quitarJugador(idx) {
-            if (!isAdmin) return;
+    async function borrarJugador(idx) {
+        const j = blacklist[idx];
+        if (firebaseListo) {
+            await db.collection('blacklist').doc(slug(j.n)).delete();
+        } else {
             blacklist.splice(idx, 1);
             renderPlayerSelect();
             renderBlacklist();
         }
+    }
 
-        window.onload = () => cargar('overall', document.querySelector('.mode-item'));
-    </script>
+    // ============ RANKING ============
+    function cargar(modo, btn) {
+        document.getElementById('ranking-view').style.display = 'block';
+        document.getElementById('blacklist-view').style.display = 'none';
+        document.getElementById('admin-box').style.display = 'none';
+        document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
+        btn.classList.add('active');
+
+        const contenedor = document.getElementById('lista');
+        contenedor.innerHTML = "";
+
+        if (database[modo].length === 0) {
+            contenedor.innerHTML = `<div class="bl-empty-state">Todavía no hay ranking cargado para este modo.</div>`;
+            return;
+        }
+
+        database[modo].forEach((j, i) => {
+            let tiersHTML = j.t.map(tier => `
+                <div class="tier-pill">
+                    <div class="tier-icon">${tier.i}</div>
+                    <span class="tier-label ${tier.l.includes('HT') ? 'HT' : 'LT'}">${tier.l}</span>
+                </div>
+            `).join('');
+
+            contenedor.innerHTML += `
+                <div class="ranking-row">
+                    <div class="rank-number">${i+1}.</div>
+                    <div class="skin-box">${j.s}</div>
+                    <div class="player-info">
+                        <p class="player-name">${j.n}</p>
+                        <p class="player-title">Combat Master (<span>${j.p} points</span>)</p>
+                    </div>
+                    <div class="region-tag">${j.r}</div>
+                    <div class="tiers-grid">${tiersHTML}</div>
+                </div>
+            `;
+        });
+    }
+
+    // ============ BLACK LIST UI ============
+    function mostrarBlacklist(btn) {
+        document.getElementById('ranking-view').style.display = 'none';
+        document.getElementById('blacklist-view').style.display = 'block';
+        document.getElementById('admin-box').style.display = 'block';
+        document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
+        btn.classList.add('active');
+        renderBlacklist();
+        renderPlayerSelect();
+    }
+
+    function renderBlacklist() {
+        const cont = document.getElementById('bl-lista');
+        cont.innerHTML = "";
+        if (blacklist.length === 0) {
+            cont.innerHTML = `<div class="bl-empty-state">La black list está vacía.</div>`;
+            return;
+        }
+        blacklist.forEach((j, idx) => {
+            let evHTML;
+            if (!j.evidence || j.evidence.length === 0) {
+                evHTML = `<div class="bl-evidence-empty">Sin pruebas cargadas todavía.</div>`;
+            } else {
+                evHTML = j.evidence.map((e, eIdx) => {
+                    let media;
+                    if (e.type === 'image') media = `<img src="${e.url}" alt="prueba">`;
+                    else if (e.type === 'video-file') media = `<video src="${e.url}" controls></video>`;
+                    else media = `<iframe src="${toEmbed(e.url)}" frameborder="0" allowfullscreen></iframe>`;
+                    const removeBtn = isAdmin ? `<button class="bl-remove-btn" onclick="quitarEvidencia(${idx}, ${eIdx})">quitar</button>` : "";
+                    return `<div class="bl-evidence-item">${media}<div class="bl-evidence-caption">${e.caption || ""} ${removeBtn}</div></div>`;
+                }).join('');
+            }
+            const removePlayerBtn = isAdmin ? `<button class="bl-remove-btn" onclick="quitarJugador(${idx})">quitar jugador</button>` : "";
+            cont.innerHTML += `
+                <div class="bl-card">
+                    <div class="bl-card-header" onclick="toggleEvidence(${idx})">
+                        <div><span class="bl-name">🚫 ${j.n}</span><span class="bl-count">(${(j.evidence||[]).length} prueba${(j.evidence||[]).length === 1 ? '' : 's'})</span></div>
+                        <div>${removePlayerBtn}</div>
+                    </div>
+                    <div class="bl-evidence" id="bl-ev-${idx}">${evHTML}</div>
+                </div>
+            `;
+        });
+    }
+
+    function toEmbed(url) {
+        const match = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+        if (match) return `https://www.youtube.com/embed/${match[1]}`;
+        return url;
+    }
+
+    function toggleEvidence(idx) { document.getElementById(`bl-ev-${idx}`).classList.toggle('open'); }
+
+    function renderPlayerSelect() {
+        const sel = document.getElementById('bl-player-select');
+        sel.innerHTML = `<option value="">— elegir jugador existente —</option>` +
+            blacklist.map((j, idx) => `<option value="${idx}">${j.n}</option>`).join('');
+    }
+
+    // ============ ADMIN ============
+    async function intentarLogin() {
+        const pass = document.getElementById('admin-pass').value;
+        const hash = await sha256(pass);
+        const msg = document.getElementById('login-msg');
+        if (hash === ADMIN_HASH) {
+            isAdmin = true;
+            document.getElementById('admin-locked').style.display = 'none';
+            document.getElementById('admin-unlocked').classList.add('open');
+            msg.textContent = "";
+            renderBlacklist();
+        } else {
+            msg.textContent = "Contraseña incorrecta";
+            msg.className = "admin-msg err";
+        }
+    }
+
+    function logout() {
+        isAdmin = false;
+        document.getElementById('admin-locked').style.display = 'flex';
+        document.getElementById('admin-unlocked').classList.remove('open');
+        document.getElementById('admin-pass').value = '';
+        renderBlacklist();
+    }
+
+    let archivoSubido = null;
+
+    function previewArchivo() {
+        const input = document.getElementById('bl-media-file');
+        const preview = document.getElementById('bl-file-preview');
+        const file = input.files[0];
+        archivoSubido = null;
+        preview.classList.remove('show');
+        preview.innerHTML = "";
+        if (!file) return;
+
+        const esImagen = file.type.startsWith('image/');
+        const esVideo = file.type.startsWith('video/');
+        if (!esImagen && !esVideo) {
+            document.getElementById('admin-msg').textContent = "Ese tipo de archivo no está soportado, subí una imagen o un video.";
+            document.getElementById('admin-msg').className = "admin-msg err";
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            archivoSubido = { type: esImagen ? 'image' : 'video-file', url: e.target.result };
+            preview.classList.add('show');
+            preview.innerHTML = esImagen
+                ? `<img src="${archivoSubido.url}"><span>${file.name}</span>`
+                : `<video src="${archivoSubido.url}" controls></video><span>${file.name}</span>`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function agregarEvidencia() {
+        if (!isAdmin) return;
+        const selectVal = document.getElementById('bl-player-select').value;
+        const newName = document.getElementById('bl-new-name').value.trim();
+        const type = document.getElementById('bl-media-type').value;
+        const url = document.getElementById('bl-media-url').value.trim();
+        const caption = document.getElementById('bl-caption').value.trim();
+        const msg = document.getElementById('admin-msg');
+
+        let entry;
+        if (archivoSubido) entry = { type: archivoSubido.type, url: archivoSubido.url, caption };
+        else if (url) entry = { type, url, caption };
+        else { msg.textContent = "Subí un archivo desde tu dispositivo o pegá una URL."; msg.className = "admin-msg err"; return; }
+
+        let idx;
+        if (newName) {
+            blacklist.push({ n: newName, evidence: [] });
+            idx = blacklist.length - 1;
+        } else if (selectVal !== "") {
+            idx = parseInt(selectVal);
+        } else {
+            msg.textContent = "Elegí un jugador existente o escribí uno nuevo.";
+            msg.className = "admin-msg err";
+            return;
+        }
+
+        blacklist[idx].evidence = blacklist[idx].evidence || [];
+        blacklist[idx].evidence.push(entry);
+        await guardarJugador(idx);
+
+        document.getElementById('bl-new-name').value = '';
+        document.getElementById('bl-media-url').value = '';
+        document.getElementById('bl-caption').value = '';
+        document.getElementById('bl-media-file').value = '';
+        document.getElementById('bl-file-preview').classList.remove('show');
+        document.getElementById('bl-file-preview').innerHTML = '';
+        archivoSubido = null;
+        msg.textContent = "Prueba agregada.";
+        msg.className = "admin-msg ok";
+        renderPlayerSelect();
+        renderBlacklist();
+    }
+
+    async function quitarEvidencia(idx, eIdx) {
+        if (!isAdmin) return;
+        blacklist[idx].evidence.splice(eIdx, 1);
+        await guardarJugador(idx);
+        renderBlacklist();
+    }
+
+    async function quitarJugador(idx) {
+        if (!isAdmin) return;
+        await borrarJugador(idx);
+        renderPlayerSelect();
+        renderBlacklist();
+    }
+
+    window.onload = () => {
+        cargar('overall', document.querySelector('.mode-item'));
+        iniciarSyncBlacklist();
+    };
+</script>
 </body>
 </html>
